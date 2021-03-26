@@ -59,10 +59,11 @@ class Search_Destroy:
         colormap = colors.ListedColormap(["grey", "green", "darkkhaki", "darkgreen"])
         self.ax.imshow(self.grid.astype(np.float), cmap=colormap)
         self.the_snitch(self.target_location[0], self.target_location[1])
+        print(self.grid[self.target_location[0]][self.target_location[1]].get_cell_type())
         plt.show()
 
     def the_snitch(self, x, y):
-        self.ax.scatter(x, y, marker="*", color="cyan", s=100)
+        self.ax.scatter(x, y, marker="*", color="cyan", s=50)
 
     def super_dumb_agent(self):
         pass
