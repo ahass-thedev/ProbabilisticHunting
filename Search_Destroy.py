@@ -134,8 +134,9 @@ class Searchdestroy:
                                     (neighbor_x + x, neighbor_y + y))
                     if new_cell not in closed_cell_list:
                         cell_queue.append(new_cell)
+
                     # cell_list.append(new_cell)
-            # print(cell_queue)
+            print(cell_queue)
             # print(cell_list)
 
     def super_basic_agent_no_map(self):
@@ -151,6 +152,7 @@ class Searchdestroy:
         for q, u in self.neighbors:
             print(self.grid[x + q][y + u])
         j = 0
+        score = 0
         while cell_queue:
             j += 1
             current_cell = cell_queue[0]
@@ -178,7 +180,7 @@ class Searchdestroy:
             x, y = current_cell.position[0], current_cell.position[1]
 
             """if the target is found, end the search loop"""
-            print("Checking cell: ", current_cell)
+            print(j,"Checking cell: ", current_cell)
 
             if random.uniform(0, 1) >= current_cell.get_cell_percentage() and \
                     current_cell.position[0] == self.target_location[0] and \
@@ -195,6 +197,11 @@ class Searchdestroy:
                                     (neighbor_x + x, neighbor_y + y))
                     if new_cell not in closed_cell_list:
                         cell_queue.append(new_cell)
+            if j >= 2499:
+                score+=j
+                j = 0
+                closed_cell_list.clear()
+                print("its been cleared")
                     # cell_list.append(new_cell)
             # print(cell_queue)
             # print(cell_list)
