@@ -63,7 +63,7 @@ class Searchdestroy:
         # self.super_dumb_agent()
         self.second_basic_agent()
         """
-        self.super_basic_agent()
+        self.super_basic_agent_no_map()
         # self.display_grid()
 
     def display_grid(self):
@@ -183,6 +183,7 @@ class Searchdestroy:
             if random.uniform(0, 1) >= current_cell.get_cell_percentage() and \
                     current_cell.position[0] == self.target_location[0] and \
                     current_cell.position[1] == self.target_location[1]:
+                print("Target has been found at: ", current_cell.position)
                 self.target_found = True
                 return True
 
@@ -192,8 +193,8 @@ class Searchdestroy:
                                     self.grid[neighbor_x + x][neighbor_y + y].get_cell_representation(),
                                     self.grid[neighbor_x + x][neighbor_y + y].get_cell_percentage(),
                                     (neighbor_x + x, neighbor_y + y))
-
-                    cell_queue.append(new_cell)
+                    if new_cell not in closed_cell_list:
+                        cell_queue.append(new_cell)
                     # cell_list.append(new_cell)
             # print(cell_queue)
             # print(cell_list)
