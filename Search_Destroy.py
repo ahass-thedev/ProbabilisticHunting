@@ -12,7 +12,7 @@ class Cell:
         self.percentage = percentage
         self.position = position
         self.representation = representation
-        self.probability = 1/2500
+        self.probability = 1 / 2500
 
     def get_cell_percentage(self):
         return self.percentage
@@ -50,7 +50,8 @@ class Searchdestroy:
             size=(dim, dim),
             p=[.25, .25, .25, .25])
         self.target_location = (random.randint(0, self.dim - 1), random.randint(0, self.dim - 1))
-        print("Snitch is located at", self.target_location)
+        print("Snitch is located at", self.target_location, self.grid[self.target_location[0]][self.target_location[1]])
+
         self.target_found = False
         self.probability_map = np.zeros(dim * dim)
         self.probability_map += (1 / (dim * dim))
@@ -63,7 +64,14 @@ class Searchdestroy:
         # self.super_dumb_agent()
         self.second_basic_agent()
         """
-        self.super_basic_agent_no_map()
+        score = 0
+        """for i in range (10):
+            self.grid = np.random.choice(
+                a=[Cell("cave", 0, .1), Cell("forest", 1, .3), Cell("hilly", 2, .7), Cell("flat", 3, .9)],
+                size=(dim, dim),
+                p=[.25, .25, .25, .25])
+            score += self.super_basic_agent()"""
+        score /= 10
         # self.display_grid()
 
     def display_grid(self):
@@ -89,8 +97,10 @@ class Searchdestroy:
         for q, u in self.neighbors:
             print(self.grid[x + q][y + u])
         j = 0
+        score = 0
         while cell_queue:
             j += 1
+            score += 1
             current_cell = cell_queue[0]
             current_index = 0
 
@@ -109,21 +119,21 @@ class Searchdestroy:
                         if random.randint(1, 11) % 2 == 0:
                             current_cell = cell
                             current_index = index
-
+            score += manhattan_distance(old_cell, current_cell)
             old_cell = cell_queue.pop(current_index)
             closed_cell_list.append(current_cell)
 
             x, y = current_cell.position[0], current_cell.position[1]
 
             """if the target is found, end the search loop"""
-            print("Checking cell: ", current_cell)
+            print(score, "Checking cell: ", current_cell)
 
-            if random.uniform(0, 1) >= current_cell.get_cell_percentage() and \
+            if random.uniform(0, 1) <= current_cell.get_cell_percentage() and \
                     current_cell.position[0] == self.target_location[0] and \
                     current_cell.position[1] == self.target_location[1]:
                 self.target_found = True
                 print("The target has been found at", current_cell.position)
-                return True
+                return score
             else:
                 current_cell.probability *= 1 - current_cell.percentage
             for neighbor_x, neighbor_y in self.neighbors:
@@ -134,7 +144,38 @@ class Searchdestroy:
                                     (neighbor_x + x, neighbor_y + y))
                     if new_cell not in closed_cell_list:
                         cell_queue.append(new_cell)
-                    # cell_list.append(new_cell)
+            if j >= 5400:
+                j = 0
+                f'''or cell in cell_queue:
+                    print("check from in here",cell)
+                    if random.uniform(0, 1) <= cell.get_cell_percentage() and \
+                            current_cell.position[0] == self.target_location[0] and \
+                            current_cell.position[1] == self.target_location[1]:
+                        self.target_found = True
+                        print("The target has been found at", current_cell.position)
+                        return True'''
+
+                closed_cell_list.clear()
+                # print(cell_queue)
+
+                """cell_queue.clear()
+                closed_cell_list.clear()
+                
+                if self.basic_movement(current_cell) is True:
+                    for i in range(self.dim):
+                        for j in range(self.dim):
+                            if manhattan_distance(current_cell,self.grid[i][j]) <= 5:
+                                cell_queue.append(self.grid[i][j])
+                else:
+                    for neighbor_x, neighbor_y in self.neighbors:
+                        if neighbor_x + x in range(self.dim) and neighbor_y + y in range(self.dim):
+                            new_cell = Cell(self.grid[neighbor_x + x][neighbor_y + y].get_cell_terrain(),
+                                            self.grid[neighbor_x + x][neighbor_y + y].get_cell_representation(),
+                                            self.grid[neighbor_x + x][neighbor_y + y].get_cell_percentage(),
+                                            (neighbor_x + x, neighbor_y + y))
+                            if new_cell not in closed_cell_list:
+                                cell_queue.append(new_cell)"""
+                # cell_list.append(new_cell)
             # print(cell_queue)
             # print(cell_list)
 
@@ -151,8 +192,10 @@ class Searchdestroy:
         for q, u in self.neighbors:
             print(self.grid[x + q][y + u])
         j = 0
+        score = 0
         while cell_queue:
             j += 1
+            score += 0
             current_cell = cell_queue[0]
             current_index = 0
 
@@ -171,7 +214,7 @@ class Searchdestroy:
                         if random.randint(1, 11) % 2 == 0:
                             current_cell = cell
                             current_index = index
-
+            score += manhattan_distance(old_cell, current_cell)
             old_cell = cell_queue.pop(current_index)
             closed_cell_list.append(current_cell)
 
@@ -185,7 +228,7 @@ class Searchdestroy:
                     current_cell.position[1] == self.target_location[1]:
                 print("Target has been found at: ", current_cell.position)
                 self.target_found = True
-                return True
+                return score
 
             for neighbor_x, neighbor_y in self.neighbors:
                 if neighbor_x + x in range(self.dim) and neighbor_y + y in range(self.dim):
@@ -195,9 +238,36 @@ class Searchdestroy:
                                     (neighbor_x + x, neighbor_y + y))
                     if new_cell not in closed_cell_list:
                         cell_queue.append(new_cell)
+
+            """cell_queue.clear()
+            closed_cell_list.clear()
+            
+            if self.basic_movement(current_cell) is True:
+                for i in range(self.dim):
+                    for j in range(self.dim):
+                        if manhattan_distance(current_cell,self.grid[i][j]) <= 5:
+                            cell_queue.append(self.grid[i][j])
+            else:
+                for neighbor_x, neighbor_y in self.neighbors:
+                    if neighbor_x + x in range(self.dim) and neighbor_y + y in range(self.dim):
+                        new_cell = Cell(self.grid[neighbor_x + x][neighbor_y + y].get_cell_terrain(),
+                                        self.grid[neighbor_x + x][neighbor_y + y].get_cell_representation(),
+                                        self.grid[neighbor_x + x][neighbor_y + y].get_cell_percentage(),
+                                        (neighbor_x + x, neighbor_y + y))
+                        if new_cell not in closed_cell_list:
+                            cell_queue.append(new_cell)"""
                     # cell_list.append(new_cell)
             # print(cell_queue)
             # print(cell_list)
+
+    def basic_movement(self, visited_cell):
+        old_coords = self.grid[self.target_location[0]][self.target_location[1]]
+        new_pos = random.choice(self.neighbors)
+        self.target_location[0] += new_pos[0]
+        self.target_location[1] += new_pos[1]
+
+        if manhattan_distance(visited_cell, old_coords) <= 5:
+            return True
 
 
 if __name__ == '__main__':
