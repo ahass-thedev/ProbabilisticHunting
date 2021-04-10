@@ -72,6 +72,7 @@ class Searchdestroy:
                 p=[.25, .25, .25, .25])
             score += self.super_basic_agent()"""
         score /= 10
+        self.super_basic_agent()
         # self.display_grid()
 
     def display_grid(self):
@@ -195,7 +196,7 @@ class Searchdestroy:
         score = 0
         while cell_queue:
             j += 1
-            score += 0
+            score += 1
             current_cell = cell_queue[0]
             current_index = 0
 
@@ -259,6 +260,112 @@ class Searchdestroy:
                     # cell_list.append(new_cell)
             # print(cell_queue)
             # print(cell_list)
+
+    def super_advanced_agent(self):
+        x, y = random.randint(0, self.dim - 1), random.randint(0, self.dim - 1)
+        # x, y = 12, 15
+        start_cell = old_cell = Cell(self.grid[x][y].get_cell_terrain(), self.grid[x][y].get_cell_representation(),
+                                     self.grid[x][y].get_cell_percentage(), (x, y))
+        cell_queue = []
+        forest_queue = []
+        cave_queue = []
+        hillLim = 2
+        forestLim = 3
+        caveLim = 4
+        closed_cell_list = []
+        i = 0
+        cell_queue.append(start_cell)
+        counter = 0
+        # closed_cell_list.append(start_cell)
+
+        for q, u in self.neighbors:
+            print(self.grid[x + q][y + u])
+        j = 0
+        score = 0
+        while cell_queue:
+            j += 1
+            score += 1
+            print(score)
+            current_cell = cell_queue[0]
+            current_index = 0
+            # print(cell_queue)
+
+            for index, cell in enumerate(cell_queue):
+                if cell.percentage != current_cell.percentage:
+                    if cell.percentage > current_cell.percentage:
+                        current_cell = cell
+                        current_index = index
+                else:
+                    if manhattan_distance(old_cell, cell) > manhattan_distance(old_cell, current_cell):
+                        current_cell = cell
+                        current_index = index
+                    else:
+                        if random.randint(1, 11) % 2 == 0:
+                            current_cell = cell
+                            current_index = index
+
+            score += manhattan_distance(old_cell, current_cell)
+            old_cell = cell_queue.pop(current_index)
+            closed_cell_list.append(current_cell)
+
+            x, y = current_cell.position[0], current_cell.position[1]
+            # print(current_cell.get_cell_terrain())
+            # print(current_cell.get_cell_percentage())
+            """if the target is found, end the search loop"""
+            print("Checking cell: ", current_cell)
+
+            if current_cell.get_cell_terrain() == "cave":
+                for i in range(caveLim):
+                    # print("Cave Search")
+                    if random.uniform(0, 1) <= current_cell.get_cell_percentage() and \
+                            current_cell.position[0] == self.target_location[0] and \
+                            current_cell.position[1] == self.target_location[1]:
+                        self.target_found = True
+                        print("FOUND")
+                        #print(counter)
+                        return True
+                    i += 1
+
+            elif current_cell.get_cell_terrain() == "forest":
+                for i in range(forestLim):
+                    # print("forest search")
+                    if random.uniform(0, 1) <= current_cell.get_cell_percentage() and \
+                            current_cell.position[0] == self.target_location[0] and \
+                            current_cell.position[1] == self.target_location[1]:
+                        self.target_found = True
+                        print("FOUND")
+                        #print(counter)
+                        return True
+                    i += 1
+
+            else:
+                for i in range(hillLim):
+                    # print("Hilly search")
+                    if random.uniform(0, 1) <= current_cell.get_cell_percentage() and \
+                            current_cell.position[0] == self.target_location[0] and \
+                            current_cell.position[1] == self.target_location[1]:
+                        self.target_found = True
+                        print("FOUND")
+                        #print(counter)
+                        return True
+                    else:
+                        current_cell.probability *= 1 - current_cell.percentage
+                    i += 1
+
+            for neighbor_x, neighbor_y in self.neighbors:
+                if neighbor_x + x in range(self.dim) and neighbor_y + y in range(self.dim):
+                    new_cell = Cell(self.grid[neighbor_x + x][neighbor_y + y].get_cell_terrain(),
+                                    self.grid[neighbor_x + x][neighbor_y + y].get_cell_representation(),
+                                    self.grid[neighbor_x + x][neighbor_y + y].get_cell_percentage(),
+                                    (neighbor_x + x, neighbor_y + y))
+                    if new_cell not in closed_cell_list:
+                        cell_queue.append(new_cell)
+                    # cell_list.append(new_cell)
+            # print(cell_queue)
+            # print(cell_list)
+            if j >= 5400:
+                closed_cell_list.clear()
+                j = 0
 
     def basic_movement(self, visited_cell):
         old_coords = self.grid[self.target_location[0]][self.target_location[1]]
